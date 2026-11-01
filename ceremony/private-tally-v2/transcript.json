@@ -50,5 +50,10 @@
       "attestation": null
     }
   ],
-  "initial_zkey_sha256": "fae8844ba9ae7dbf43acc9c20d13aa56d995dac42765d67de7b5028be4f125e2"
+  "initial_zkey_sha256": "fae8844ba9ae7dbf43acc9c20d13aa56d995dac42765d67de7b5028be4f125e2",
+  "final": {
+    "beacon_hash": "0x0734b3f08b5e78144c73a58313647a94f053223d8b71ae17ed18cf3140dbb44d",
+    "zkey_sha256": "01f76014a6fbad1a0433781aa6518ec36fea27536e71354d88f134bc04a180fe",
+    "vk_sha256": "7749a5fbdb778598ac514441f374c89a1890ce0e1e00cf34e8465891f69b5055"
+  }
 }

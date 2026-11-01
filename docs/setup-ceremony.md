@@ -1,14 +1,16 @@
 # Setup ceremony for the private tally
 
-**Status: open.** The circuit was frozen at tag `private-tally-v2-circuit-freeze`
-(commit `774aafd`) and the ceremony opened on 17 October 2026. The beacon is the
-hash of **CKB mainnet block 20,870,000**, announced before the first
-contribution; no contribution is accepted once that block exists. File names,
-hashes and every accepted contribution are recorded in
-[`ceremony/private-tally-v2/`](../ceremony/private-tally-v2/). To take part, ask
-for a turn on the
-[Nervos Talk thread](https://talk.nervos.org/t/noir-ckb-update-what-i-decided-after-the-direction-check-what-you-can-try-today-and-where-this-is-going/10968)
-or by opening an issue on this repository.
+**Status: complete.** The circuit was frozen at tag
+`private-tally-v2-circuit-freeze` (commit `774aafd`) and the ceremony opened on
+17 October 2026. Four contributions were verified and accepted. Contributions
+closed when CKB mainnet block 20,870,000 was produced; its hash,
+`0x0734b3f08b5e78144c73a58313647a94f053223d8b71ae17ed18cf3140dbb44d`, was
+applied as the beacon on 1 November 2026. The final key, verification key,
+verification log and full transcript are in
+[`ceremony/private-tally-v2/`](../ceremony/private-tally-v2/). Contributors can
+find their hash in
+[`verify-final.log`](../ceremony/private-tally-v2/verify-final.log). The rest of
+this guide is kept as a record of how the ceremony ran and how to check it.
 
 ## Why a ceremony is needed
 

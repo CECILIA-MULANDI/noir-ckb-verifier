@@ -1,0 +1,49 @@
+[INFO]  snarkJS: Reading r1cs
+[INFO]  snarkJS: Reading tauG1
+[INFO]  snarkJS: Reading tauG2
+[INFO]  snarkJS: Reading alphatauG1
+[INFO]  snarkJS: Reading betatauG1
+[INFO]  snarkJS: Circuit hash: 
+		19184497 8787c91a 55987794 af7668e1
+		e1d7e6a8 25c9e749 7329c294 c2bec1d6
+		5e6aa957 1dc45589 c5b07469 982298f2
+		d46c2877 5b1a973d d17a19b4 a478e07a
+[INFO]  snarkJS: Circuit Hash: 
+		19184497 8787c91a 55987794 af7668e1
+		e1d7e6a8 25c9e749 7329c294 c2bec1d6
+		5e6aa957 1dc45589 c5b07469 982298f2
+		d46c2877 5b1a973d d17a19b4 a478e07a
+[INFO]  snarkJS: -------------------------
+[INFO]  snarkJS: contribution #5 CKB mainnet block 20870000:
+		241f0605 a7796cee fb6bbe8f aaa2c65d
+		5abedb0d a49e4f19 92abfcec b74d62a3
+		9e672fef fa05f597 bd15f985 585cfc61
+		d73fca02 6ddc2aed 20b857e4 f13b84a7
+[INFO]  snarkJS: Beacon generator: 0734b3f08b5e78144c73a58313647a94f053223d8b71ae17ed18cf3140dbb44d
+[INFO]  snarkJS: Beacon iterations Exp: 10
+[INFO]  snarkJS: -------------------------
+[INFO]  snarkJS: contribution #4 CECILIA-MULANDI:
+		136116c8 a5e84f8b 5dd85bcd f028ed43
+		18e5de5d bd8dee41 34b722bf bb9ec1e2
+		6be80ea3 908f0e36 b84d19c7 45babd06
+		dca3584b 3b5309c1 0355aed1 5fa78e00
+[INFO]  snarkJS: -------------------------
+[INFO]  snarkJS: contribution #3 alienate:
+		707e9bd6 22e8cbb2 0b499c9a 4bce7a07
+		cad3b123 b8d35dd8 b4cd5ff0 ab9b19b1
+		6cbd3b36 bf2bb8a7 f2b157f0 d1a21b96
+		1fbccac2 1c06f1e2 412de594 c652ca8f
+[INFO]  snarkJS: -------------------------
+[INFO]  snarkJS: contribution #2 truthixify:
+		1f06854b 054d584b e0e3f273 1fc0f324
+		1b5dd844 23ae81d8 93237f85 509a1ccd
+		e3991f99 279c7e92 489cd98e bd414bbb
+		d55a427d b973f784 70df78ba 62ebc457
+[INFO]  snarkJS: -------------------------
+[INFO]  snarkJS: contribution #1 Xiaomao:
+		b00a21cf 520183f0 e69311d5 69c211af
+		d0b35814 bafbb920 1d49e8c2 fd809536
+		120f22d7 fe017547 7e90ddc8 ccbe49da
+		b117fde3 5aa345da 8a39ab2f 3d96724a
+[INFO]  snarkJS: -------------------------
+[INFO]  snarkJS: ZKey Ok!
