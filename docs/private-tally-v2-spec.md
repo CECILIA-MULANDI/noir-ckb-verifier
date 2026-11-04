@@ -1,8 +1,10 @@
 # Private tally v2 — draft specification
 
-Status: **accepted design; circuit, development setup, secret handling, Type Script
-CKB-VM matrix, mutation tests, client and local lifecycle implemented (D1–D2,
-D3 on macOS)**; launcher integration, Linux runs and the ceremony not done (decisions recorded in section 12). Circuit: [`circuits/private-tally-v2/`](../circuits/private-tally-v2/). Profile `noir-ckb/private-tally/v2`
+Status: **implemented and deployed on CKB testnet** with the verification key
+from the public setup ceremony; circuit, setup, secret handling, Type Script
+CKB-VM matrix, mutation tests, client, local lifecycle on macOS and Linux, and a
+testnet lifecycle (see [testnet evidence](../evidence/private-tally-testnet.md)).
+Circuit: [`circuits/private-tally-v2/`](../circuits/private-tally-v2/). Profile `noir-ckb/private-tally/v2`
 is a new, separate application. It does not change `owned-counter/v1`, its
 deployment or its evidence. Feasibility results that informed this draft are in
 [portable evidence](../evidence/week-15-portable.md) (private tally spike).
