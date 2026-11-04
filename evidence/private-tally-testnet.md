@@ -59,10 +59,32 @@ same capacity (200 CKB) under the guard Lock. On chain, each update shows only a
 new commitment and a proof; the amount added is not visible, and the cover
 update is indistinguishable from an update that adds a value.
 
+## Join path (5 November 2026)
+
+`scripts/join-private-tally.py init` lets a participant use this deployment
+without deploying anything. Given the participant's own `--ceremony` setup, it
+checked that the RPC is CKB testnet, that the three live Cells match the public
+record, that the live verification key is byte for byte the key the
+participant's setup derived from the ceremony key, and that the guard code
+equals the local `ckb-always-success-script` 0.0.1 crate. It then wrote the
+release and deployment files used by `private-tally-client.py`.
+
+A second, separate testnet account then created its own tally through this path,
+with its own secret key, and added a hidden amount to it:
+
+| Stage | Transaction | Result |
+| --- | --- | --- |
+| Create at 0 | [0x86e7f5c9…26fe71](https://testnet.explorer.nervos.org/transaction/0x86e7f5c9d64f0a0a1db8d4e893cc115ab6cc9b84630962c6718b00d94226fe71) | Proof re-checked after signing; committed; state version 1 |
+| Update by a hidden amount | [0x5b2d128d…29caff](https://testnet.explorer.nervos.org/transaction/0x5b2d128dab1f3b888f2cc98b2fa844dc67b1e9eec24eeeee354da6bcd029caff) | Same; state version 2; the private state's value matched the amount added |
+
+Participant guide: [Try the private tally](../docs/try-the-private-tally.md).
+
 ## Limits
 
-- One account ran the lifecycle. No outside participant has used this
-  deployment yet, and there is no participant join tool for the tally yet.
+- Both accounts belong to the deployer. No outside participant has used this
+  deployment yet.
+- The join path checks the deployed Type Script bytes against the public record;
+  it does not rebuild them from source.
 - The ceremony is a public developer-preview ceremony, not an audited
   production setup.
 - One tally Cell's updates are linkable to each other; update count, timing and
