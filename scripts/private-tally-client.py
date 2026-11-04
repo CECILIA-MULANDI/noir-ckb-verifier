@@ -103,7 +103,8 @@ def prove(work, cfg, name, values):
     r = release(cfg["release"])
     setup = Path(r["setup"])
     m = c.read(setup / "manifest.json")
-    for f in ("development.zkey", "verification_key.json", "circuit/private_tally_v2.json"):
+    zkey = m.get("zkey", "development.zkey")
+    for f in (zkey, "verification_key.json", "circuit/private_tally_v2.json"):
         c.require(c.sha(setup / f) == m["artifacts"][f], f"proving artifact changed: {f}")
     cli = setup / "backend-target/debug/noir-cli"
     c.require(c.sha(cli) == m["backend_binary_sha256"], "backend binary changed")
@@ -125,7 +126,7 @@ def prove(work, cfg, name, values):
         run([cli, "interop", setup / "circuit/private_tally_v2.json", scratch / "inputs.json", "--out", scratch / "interop"], quiet=True)
         c.require(c.sha(scratch / "interop/circuit.r1cs") == m["artifacts"]["circuit.r1cs"], "R1CS differs from setup")
         run(SNARK + ["wtns", "check", scratch / "interop/circuit.r1cs", scratch / "interop/witness.wtns"], quiet=True)
-        run(SNARK + ["groth16", "prove", setup / "development.zkey", scratch / "interop/witness.wtns",
+        run(SNARK + ["groth16", "prove", setup / zkey, scratch / "interop/witness.wtns",
                      kept / "proof.json", kept / "public.json"])
     finally:
         shutil.rmtree(scratch, ignore_errors=True)
@@ -226,7 +227,8 @@ def cmd_build(a):
                  for n, f in (("type", out / "private-tally"), ("vk", out / "vk.mol.bin"), ("guard", out / "guard-always-success"))}
     policy = dict(p, profile=pt.PROFILE, guard_data_hash=artifacts["guard"]["data_hash"], vk_data_hash=artifacts["vk"]["data_hash"])
     c.write(out / "release.json", dict(profile=pt.PROFILE, policy=policy, setup=str(setup), artifacts=artifacts,
-                                       development_only=True))
+                                       development_only="ceremony" not in m,
+                                       ceremony=m.get("ceremony")))
     print(out / "release.json")
 
 
@@ -234,10 +236,13 @@ def cmd_prepare_deploy(a):
     r = release(a.release)
     c.network(a.rpc, r["policy"]["network_domain"])
     lock = c.owner(a.owner)
-    point = c.op(a.funding)
-    total = funding_cell(dict(rpc=a.rpc), lock, point)
+    points = [c.op(f) for f in a.funding]
+    c.require(len({(p["tx_hash"], p["index"]) for p in points}) == len(points), "the same funding Cell was given twice")
+    # Each funding Cell must be a plain, empty Cell of the account, so code or
+    # application Cells (for example an existing deployment) are never spent.
+    total = sum(funding_cell(dict(rpc=a.rpc), lock, p) for p in points)
     tx = c.base(r["policy"]["owner_dep"])
-    tx["inputs"] = [dict(since="0x0", previous_output=point)]
+    tx["inputs"] = [dict(since="0x0", previous_output=p) for p in points]
     for name in ("type", "vk", "guard"):
         d = c.hx(Path(r["artifacts"][name]["path"]).read_bytes())
         o = c.output(0, lock)
@@ -247,8 +252,8 @@ def cmd_prepare_deploy(a):
     change = total - sum(int(o["capacity"], 16) for o in tx["outputs"]) - a.fee
     tx["outputs"].append(c.output(change, lock))
     tx["outputs_data"].append("0x")
-    c.require(change >= c.minimum(tx["outputs"][-1], "0x"), "funding Cell too small for the deployment")
-    tx["witnesses"] = [c.witness()]
+    c.require(change >= c.minimum(tx["outputs"][-1], "0x"), "funding Cells too small for the deployment")
+    tx["witnesses"] = [c.witness()] + ["0x"] * (len(points) - 1)
     save_tx(a.out, tx)
     print(json.dumps(dict(transaction_file=str(a.out), outputs=["type", "vk", "guard", "change"], signs=False, broadcasts=False)))
 
@@ -475,8 +480,10 @@ def main(argv=None):
     s = sub.add_parser("prepare-deploy")
     for k in ("release", "out"):
         s.add_argument("--" + k, type=Path, required=True)
-    for k in ("rpc", "owner", "funding"):
+    for k in ("rpc", "owner"):
         s.add_argument("--" + k, required=True)
+    s.add_argument("--funding", action="append", required=True,
+                   help="plain empty Cell of the account as <tx_hash>:<index>; repeat to combine several")
     s.add_argument("--fee", type=int, default=DEFAULT_FEE)
     s.set_defaults(func=cmd_prepare_deploy)
     s = sub.add_parser("confirm-deploy")
