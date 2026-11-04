@@ -523,8 +523,9 @@ Your transactions are visible on
 The private tally is the next example: the Cell holds a hidden number, and
 whoever knows a secret key can add to it with a proof, without a signature.
 Its design is in the [private tally v2 design](private-tally-v2-spec.md). It is
-not on testnet yet: that waits for the [setup ceremony](setup-ceremony.md). You
-can run it locally now, with the same setup as Part 1.
+deployed on testnet with the key from the public [setup ceremony](setup-ceremony.md);
+to create your own tally there, follow [Try the private tally](try-the-private-tally.md).
+The commands below run it on a private local chain instead.
 
 **Container** (after `scripts/run-counter-container.sh build`):
 
