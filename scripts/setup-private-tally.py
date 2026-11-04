@@ -12,6 +12,13 @@ BLAKE2b hash; any other file (for example PSE's ppot_0080_12.ptau) must pass
 `snarkjs powersoftau verify`, and its hash and contribution list are recorded.
 Either way phase 2 has one development contribution: this is NOT the ceremony.
 
+With --ceremony DIR (a finalized ceremony folder such as
+ceremony/private-tally-v2) the run skips the setup and uses the ceremony's final
+key instead. It requires the freshly built R1CS to equal the frozen one, the
+final key and verification key to match the transcript hashes, `snarkjs zkey
+verify` to pass against --ptau, and the key's exported verification key to equal
+the published one; then it runs the same proofs, rejections and adapter checks.
+
 Secrets (keys, blinding factors, inputs, .wtns witnesses) exist only under
 <out>/private (mode 0700), which is deleted at the end unless --keep-private.
 The run fails if any secret appears in a kept file.
@@ -81,7 +88,10 @@ def main():
     ap.add_argument("--nargo", default="nargo")
     ap.add_argument("--ptau", type=Path, help="prepared Perpetual Powers of Tau file (Hermez or PSE ppot_0080)")
     ap.add_argument("--keep-private", action="store_true", help="keep throwaway secrets for debugging")
+    ap.add_argument("--ceremony", type=Path, help="finalized ceremony folder; use its final key instead of a new setup")
     args = ap.parse_args()
+    if args.ceremony and not args.ptau:
+        ap.error("--ceremony needs --ptau (the phase 1 file the ceremony used)")
     out, backend = args.out.resolve(), args.backend.resolve()
     out.mkdir(parents=True, exist_ok=False)
     log = []
@@ -176,7 +186,36 @@ def main():
             raise RuntimeError("unexpected R1CS input counts")
         manifest.update(constraints=r1cs["nConstraints"], wires=r1cs["nVars"], r1cs_sha256=sha(r1cs_path))
 
-        if args.ptau:
+        if args.ceremony:
+            cer = args.ceremony.resolve()
+            t = json.loads((cer / "transcript.json").read_text())
+            if t.get("profile") != pt.PROFILE or "final" not in t:
+                raise RuntimeError("ceremony is not a finalized private tally v2 ceremony")
+            if sha(r1cs_path) != t["r1cs_sha256"] or sha(cer / "circuit.r1cs") != t["r1cs_sha256"]:
+                raise RuntimeError("this build's R1CS differs from the frozen ceremony circuit")
+            if sha(cer / "zkeys/tally_final.zkey") != t["final"]["zkey_sha256"]:
+                raise RuntimeError("tally_final.zkey differs from the transcript")
+            if sha(cer / "verification_key.json") != t["final"]["vk_sha256"]:
+                raise RuntimeError("verification_key.json differs from the transcript")
+            phase1 = args.ptau.resolve()
+            digest = blake2b(phase1)
+            if digest != t["ptau"]["blake2b"]:
+                raise RuntimeError("--ptau is not the ceremony's phase 1 file")
+            manifest.update(phase1=f"{t['ptau']['file']} (ceremony phase 1)", phase1_blake2b=digest,
+                            ptau_power=ptau_power(phase1),
+                            setup=f"CEREMONY: {pt.PROFILE} phase 2 with {len(t['contributions'])} contributions and "
+                                  f"the beacon of {t['beacon']['network']} block {t['beacon']['height']}; "
+                                  "public testnet developer-preview ceremony, not an audited production setup",
+                            ceremony=dict(freeze_commit=t["freeze_commit"], contributions=len(t["contributions"]),
+                                          beacon=t["beacon"], final=t["final"]))
+            zkey = "ceremony.zkey"
+            shutil.copy2(cer / "zkeys/tally_final.zkey", out / zkey)
+            run(snark + ["zkey", "verify", r1cs_path, phase1, out / zkey])
+            run(snark + ["zkey", "export", "verificationkey", out / zkey, out / "verification_key.json"])
+            if json.loads((out / "verification_key.json").read_text()) != json.loads((cer / "verification_key.json").read_text()):
+                raise RuntimeError("the final key does not export the published verification key")
+            shutil.copy2(cer / "verification_key.json", out / "verification_key.json")
+        elif args.ptau:
             phase1 = args.ptau.resolve()
             if phase1.stat().st_size < 1_000_000:
                 raise RuntimeError(f"{phase1} is too small to be a ptau file (a failed download?)")
@@ -226,19 +265,21 @@ def main():
                 (out / p).unlink()
             phase1 = out / "phase2.ptau"
             manifest["phase1"] = f"local single-party, power {power}"
-        manifest["ptau_power"] = power
-
-        run(snark + ["groth16", "setup", r1cs_path, phase1, out / "initial.zkey"])
-        run(snark + ["zkey", "contribute", out / "initial.zkey", out / "development.zkey",
-                     "--name=DEVELOPMENT ONLY", "-e=DEVELOPMENT-ONLY-private-tally-v2-phase2"])
-        (out / "initial.zkey").unlink()
-        run(snark + ["zkey", "verify", r1cs_path, phase1, out / "development.zkey"])
-        run(snark + ["zkey", "export", "verificationkey", out / "development.zkey", out / "verification_key.json"])
+        if not args.ceremony:
+            manifest["ptau_power"] = power
+            zkey = "development.zkey"
+            run(snark + ["groth16", "setup", r1cs_path, phase1, out / "initial.zkey"])
+            run(snark + ["zkey", "contribute", out / "initial.zkey", out / zkey,
+                         "--name=DEVELOPMENT ONLY", "-e=DEVELOPMENT-ONLY-private-tally-v2-phase2"])
+            (out / "initial.zkey").unlink()
+            run(snark + ["zkey", "verify", r1cs_path, phase1, out / zkey])
+            run(snark + ["zkey", "export", "verificationkey", out / zkey, out / "verification_key.json"])
+        manifest["zkey"] = zkey
 
         for name, values in cases.items():
             proofs = out / "proofs" / name
             proofs.mkdir(parents=True)
-            run(snark + ["groth16", "prove", out / "development.zkey", private.path / name / "interop/witness.wtns",
+            run(snark + ["groth16", "prove", out / zkey, private.path / name / "interop/witness.wtns",
                          proofs / "proof.json", proofs / "public.json"])
             if json.loads((proofs / "public.json").read_text()) != values["_public"]:
                 raise RuntimeError(f"{name}: proof public values differ")

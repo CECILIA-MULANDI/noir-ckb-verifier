@@ -113,7 +113,7 @@ class Matrix:
         self.run([cli, "interop", self.artifact, work / "inputs.json", "--out", work / "interop"], redact=True)
         kept = self.out / "proofs" / name
         kept.mkdir(parents=True)
-        self.run(SNARK + ["groth16", "prove", self.setup / "development.zkey", work / "interop/witness.wtns",
+        self.run(SNARK + ["groth16", "prove", self.setup / c.read(self.setup / "manifest.json").get("zkey", "development.zkey"), work / "interop/witness.wtns",
                           kept / "proof.json", kept / "public.json"])
         public = [str(values[k]) for k in ("c_old", "c_new", "ctx_lo", "ctx_hi")]
         c.require(c.read(kept / "public.json") == public, f"{name}: proof public values differ")
