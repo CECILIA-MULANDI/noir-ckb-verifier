@@ -31,25 +31,31 @@ deployment's records are in the [testnet evidence](../evidence/private-tally-tes
 
 ## Before you start
 
-You need the `noir-ckb-verifier` folder and the native tools from
-[Try the counter](try-the-counter.md):
+**1. Clone this repository** onto your computer and go into it:
 
-1. "Before you start: pick your setup": the `git clone` command, then
-   `cd noir-ckb-verifier`.
-2. Part 1, option B (native), steps 1–6, ending with the doctor:
+```bash
+git clone https://github.com/wamimi/noir-ckb-verifier.git
+cd noir-ckb-verifier
+```
 
-   ```bash
-   python3 -B scripts/start-counter.py doctor
-   ```
+Run every command in this guide from inside this `noir-ckb-verifier` folder.
 
-   Every line should say `OK`.
+**2. Install the tools.** Follow [Try the counter](try-the-counter.md), Part 1,
+option B (native), steps 1–6. They install the Rust versions, the pinned proving
+backend (cloned next to this folder as `../Noir-Groth16`), snarkjs, the CKB
+tools and the Noir compiler. The last step checks everything:
+
+```bash
+python3 -B scripts/start-counter.py doctor
+```
+
+Every line should say `OK`. You don't need to run the counter demo itself.
 
 Supported: macOS on Apple silicon, and Linux (x86_64 and ARM64).
 
-Run every command below **from inside the `noir-ckb-verifier` folder**, and
-**keep the same terminal window open** until the end. Several steps store
-values (your address, the Cell you pay with) that later steps reuse. If you do
-close it, `cd` back into the folder and paste the `export` lines from Step 4
+**3. Keep one terminal window open** until the end. Several steps store values
+(your address, the Cell you pay with) that later steps reuse. If you do close
+it, `cd` back into `noir-ckb-verifier` and paste the `export` lines from Step 4
 and Step 5 again.
 
 ## Step 1. Download the phase 1 file
