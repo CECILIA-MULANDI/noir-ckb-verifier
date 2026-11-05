@@ -79,6 +79,25 @@ with its own secret key, and added a hidden amount to it:
 
 Participant guide: [Try the private tally](../docs/try-the-private-tally.md).
 
+## Two-command path (5 November 2026)
+
+`scripts/try-private-tally.py` wraps the same steps: `install` sets up the
+tools (listing every action first), and `run` builds the ceremony setup, runs
+the join check, uses a new testnet-only account, finds a funding Cell through
+the indexer, and asks before signing and sending each transaction. A third
+account, created by `run` itself and funded from the faucet, completed the flow
+on macOS ARM64:
+
+| Stage | Transaction |
+| --- | --- |
+| Create at 0 | [0x7dd48f3d…7fefa5](https://testnet.explorer.nervos.org/transaction/0x7dd48f3d0f3dfb48b1f92431b70ac39d0b06f8dc69e9b58bb08e92cc597fefa5) |
+| Update by a hidden amount | [0x228140a8…761096](https://testnet.explorer.nervos.org/transaction/0x228140a833a3c78bdbf626380d013f0ee65033b95959908b89eb05dd5b761096) |
+| Update by a hidden amount | [0xda565186…1fd6cf](https://testnet.explorer.nervos.org/transaction/0xda565186d8ccfb0b05c8e81adf7d36abe7b3805906b1515a31d55437ed1fd6cf) |
+
+Each transaction was re-checked after signing, recorded only after it was
+committed, and followed by an automatic backup of the private folder. The final
+private state's value matched the sum of the amounts entered.
+
 ## Limits
 
 - Both accounts belong to the deployer. No outside participant has used this
