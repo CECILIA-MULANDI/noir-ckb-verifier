@@ -139,6 +139,17 @@ and which account paid. One tally's updates are linkable to each other.
 | Testnet wallet | `~/.ckb-cli-noir-ckb-tally` | **Never** |
 | Transactions and proofs | `target/try-private-tally/my-tally/public` | Safe (they're on chain anyway) |
 
+## Running it again
+
+- **To add more to your tally**, run the same command again:
+  `python3 -B scripts/try-private-tally.py run`. It reuses your account and tally.
+- **To make a second, separate tally with a new account**, give it its own
+  wallet and work folders:
+
+  ```bash
+  CKB_CLI_HOME="$HOME/.ckb-cli-noir-ckb-tally-2" python3 -B scripts/try-private-tally.py run --work target/try-private-tally-2
+  ```
+
 ## Share how it went
 
 Please share your computer (for example "MacBook M2" or "Ubuntu 24.04 x86_64"),
