@@ -100,7 +100,7 @@ private state's value matched the sum of the amounts entered.
 
 ## Limits
 
-- Both accounts belong to the deployer. No outside participant has used this
+- All three accounts belong to the deployer. No outside participant has used this
   deployment yet.
 - The join path checks the deployed Type Script bytes against the public record;
   it does not rebuild them from source.
