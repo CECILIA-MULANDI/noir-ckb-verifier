@@ -1,0 +1,14 @@
+# noir-ckb/private-tally/range: prove a bound on a tally's hidden value without
+# revealing it. Reuses the v2 commitment library unchanged, so a proof here opens
+# exactly the commitment the deployed Type Script stores.
+#
+# Deliberately NOT a member of the private-tally-v2 workspace: that workspace's
+# R1CS is frozen by the setup ceremony, and `nargo compile --workspace` must keep
+# producing the same artifact.
+[package]
+name = "private_tally_range"
+type = "bin"
+authors = ["Cecilia Mulandi"]
+
+[dependencies]
+private_tally_commitment = { path = "../private-tally-v2/commitment" }
